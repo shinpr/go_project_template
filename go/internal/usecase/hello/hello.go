@@ -19,5 +19,5 @@ func NewInteractor(
 
 func (i *Interactor) ShowMessage() {
 	message, _ := i.helloRepository.GetMessage()
-	fmt.Println(message.Message)
+	fmt.Println(message.Message) // TODO: usecaseから出す
 }
