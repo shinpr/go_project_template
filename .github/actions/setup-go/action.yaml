@@ -1,0 +1,33 @@
+name: setup-go
+description: Setup Go toolchain with module caches
+
+inputs:
+  cache-ver:
+    description: Cache version
+    required: true
+  working-directory:
+    description: Working directory
+    required: false
+    default: '.'
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go/go.mod
+        cache: false
+
+    - name: Clear caches
+      shell: bash
+      run: |
+        go clean -cache -testcache
+
+    - name: Restore cache
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ inputs.cache-ver }}-${{ runner.os }}-go-${{ hashFiles('go/go.sum') }} }}

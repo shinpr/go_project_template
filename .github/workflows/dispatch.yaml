@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+      - 'feature/**'
+      - 'fix/**'
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        requred: false
+        default: 'false'
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Filter by paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ github.ref }}
+          filters: |
+            backend:
+              - '.github/workflows/**'
+              - 'go/cmd/**'
+              - 'go/internal/**'
+              - 'go/go.mod'
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+
+  backend-lint:
+    needs:
+      - detect-changes
+    if: ${{ !cancelled() && needs.detect-changes.outputs.backend == 'true' }}
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-go
+        with:
+          cache-ver: ${{ vars.CACHE_VER }}
+      - name: Generate list of directories containing modified Go files
+        run: |
+          CHANGE_DIRS=$(git diff --name-only --diff-filter=ACMRT origin/${{ github.base_ref }} origin/${{ github.head_ref }} | grep '\.go$' | xargs -I{} dirname {} | sort | uniq | sed -e 's/go\///')
+          echo "CHANGE_DIRS=$(echo $CHANGE_DIRS | tr '\n' ' ')" >> $GITHUB_ENV
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.58.1
+          skip-cache: true
+          working-directory: go
+          args: -v -c .golangci.yml ${{ env.CHANGE_DIRS }}

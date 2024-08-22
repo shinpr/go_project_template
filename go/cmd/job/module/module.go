@@ -7,10 +7,10 @@ import (
 
 type Module struct {
 	// repositories
-	helloRepository	repository.Hello
+	helloRepository repository.Hello
 
 	// usecases
-	HelloInteractor	*hellousecase.Interactor
+	HelloInteractor *hellousecase.Interactor
 }
 
 func NewModule() (*Module, error) {
