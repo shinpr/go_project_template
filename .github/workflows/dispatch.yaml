@@ -55,3 +55,21 @@ jobs:
           skip-cache: true
           working-directory: go
           args: -v -c .golangci.yml ${{ env.CHANGE_DIRS }}
+
+  backend-test:
+    needs:
+      - detect-changes
+    if: ${{ !cancelled() && needs.detect-changes.outputs.backend == 'true' }}
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-go
+        with:
+          cache-ver: ${{ vars.CACHE_VER }}
+      - name: Test code
+        run: |
+          go test -count=1 -v ./...
+        working-directory: go

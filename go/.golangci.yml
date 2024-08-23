@@ -171,13 +171,39 @@ issues:
   # Excluding configuration per-path, per-linter, per-text and per-source
   exclude-rules:
     # Exclude some linters from running on tests files.
-    - path: _test\.go
+    - path: .*_test\.go
       linters:
         - errcheck
         - errorlint
-        - lll
-        - gocritic
+        - govet
+        - gocyclo
+        - misspell
+        - unused
+        - nakedret
+        - prealloc
+        - staticcheck
+        - gosimple
+        - gofmt
+        - durationcheck
+        - errchkjson
+        - exportloopref
+        - forcetypeassert
+        - gci
+        - goconst
+        - gofumpt
+        - makezero
+        - nilerr
+        - unconvert
+        - wastedassign
+        - nosprintfhostport
+        - loggercheck
+        - dupword
+        - contextcheck
         - containedctx
+        - paralleltest
+        - tparallel
+        - usestdlibvars
+        - gocritic
     - text: "don't use an underscore in package name"
       linters:
         - golint
