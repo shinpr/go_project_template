@@ -11,5 +11,5 @@ func TestGetMessage(t *testing.T) {
 	repository := NewHello()
 	m, err := repository.GetMessage()
 	require.NoError(t, err)
-	assert.Equal(t, m.Message, "Hello, World!")
+	assert.Equal(t, "Hello, World!", m.Message)
 }
